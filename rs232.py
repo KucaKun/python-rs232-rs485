@@ -28,6 +28,7 @@ if args.port != "loopback":
     if args.port not in get_serials():
         print("ERROR: No such port")
         exit(1)
+
 if args.parity == "none":
     parity = serial.PARITY_NONE
 elif args.parity == "odd":
@@ -53,9 +54,10 @@ elif args.format == 8:
 else:
     print("ERROR: Bad format")
     exit(1)
+
 if args.port != "loopback":
     ser = serial.Serial(
-        port="COM1",
+        port=args.port,
         baudrate=args.baudrate,
         parity=parity,
         stopbits=stopbits,
