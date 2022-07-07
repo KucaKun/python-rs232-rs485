@@ -81,6 +81,10 @@ def cli():
     parser.add_argument(
         "--timeout", type=int, help="seconds of response timeout", default=3
     )
+    parser.add_argument(
+        "--address", type=int, help="1-247 (only works on client)", default=1
+    )
+
     args = parser.parse_args()
     if args.port != "loopback":
         if args.port not in get_serials():
@@ -111,6 +115,10 @@ def cli():
         args.format = serial.EIGHTBITS
     else:
         print("ERROR: Bad format")
+        exit(1)
+
+    if args.address < 1 or args.address > 247:
+        print("ERROR: Bad address")
         exit(1)
 
     return args
