@@ -1,4 +1,13 @@
 import sys
+import argparse
+import serial
+
+
+def get_serials():
+    serials = []
+    for port in serial.tools.list_ports.comports():
+        serials.append(port.device)
+    return serials
 
 
 def lrc(byte_data):
@@ -60,3 +69,48 @@ def send(ser, address, instruction, data):
 
 def receive(ser):
     return unpack_frame(ser.readline().decode("ascii"))
+
+
+def cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("port", type=str, default="loopback")
+    parser.add_argument("--baudrate", type=int, default="9600")
+    parser.add_argument("--parity", type=str, help="none, odd or even", default="none")
+    parser.add_argument("--stopbits", type=int, help="1 or 2 bits", default=1)
+    parser.add_argument("--format", type=int, help="7 or 8 bits", default=8)
+    parser.add_argument(
+        "--timeout", type=int, help="seconds of response timeout", default=3
+    )
+    args = parser.parse_args()
+    if args.port != "loopback":
+        if args.port not in get_serials():
+            print("ERROR: No such port")
+            exit(1)
+
+    if args.parity == "none":
+        args.parity = serial.PARITY_NONE
+    elif args.parity == "odd":
+        args.parity = serial.PARITY_ODD
+    elif args.parity == "even":
+        args.parity = serial.PARITY_EVEN
+    else:
+        print("ERROR: Bad parity")
+        exit(1)
+
+    if args.stopbits == 1:
+        args.stopbits = serial.STOPBITS_ONE
+    elif args.stopbits == 2:
+        args.stopbits = serial.STOPBITS_TWO
+    else:
+        print("ERROR: Bad stopbits")
+        exit(1)
+
+    if args.format == 7:
+        args.format = serial.SEVENBITS
+    elif args.format == 8:
+        args.format = serial.EIGHTBITS
+    else:
+        print("ERROR: Bad format")
+        exit(1)
+
+    return args

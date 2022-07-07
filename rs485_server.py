@@ -1,4 +1,3 @@
-import argparse
 import time
 import serial
 from rs485_core import send, receive
@@ -11,57 +10,14 @@ def get_serials():
     return serials
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("port", type=str, default="loopback")
-parser.add_argument("--baudrate", type=int, default="9600")
-parser.add_argument("--parity", type=str, help="none, odd or even", default="none")
-parser.add_argument("--stopbits", type=int, help="1 or 2 bits", default=1)
-parser.add_argument("--format", type=int, help="7 or 8 bits", default=8)
-parser.add_argument(
-    "--timeout", type=int, help="seconds of response timeout", default=3
-)
-args = parser.parse_args()
-
-if args.port != "loopback":
-    if args.port not in get_serials():
-        print("ERROR: No such port")
-        exit(1)
-
-if args.parity == "none":
-    parity = serial.PARITY_NONE
-elif args.parity == "odd":
-    parity = serial.PARITY_ODD
-elif args.parity == "even":
-    parity = serial.PARITY_EVEN
-else:
-    print("ERROR: Bad parity")
-    exit(1)
-
-if args.stopbits == 1:
-    stopbits = serial.STOPBITS_ONE
-elif args.stopbits == 2:
-    stopbits = serial.STOPBITS_TWO
-else:
-    print("ERROR: Bad stopbits")
-    exit(1)
-
-if args.format == 7:
-    format = serial.SEVENBITS
-elif args.format == 8:
-    format = serial.EIGHTBITS
-else:
-    print("ERROR: Bad format")
-    exit(1)
-
-
 if __name__ == "__main__":
-
+    args = cli()
     if args.port != "loopback":
         ser = serial.Serial(
             port=args.port,
             baudrate=args.baudrate,
-            parity=parity,
-            stopbits=stopbits,
+            parity=args.parity,
+            stopbits=args.stopbits,
             bytesize=format,
             timeout=args.timeout,
             xonxoff=args.xonxoff,
@@ -72,8 +28,8 @@ if __name__ == "__main__":
         ser = serial.serial_for_url(
             "loop://",
             baudrate=args.baudrate,
-            parity=parity,
-            stopbits=stopbits,
+            parity=args.parity,
+            stopbits=args.stopbits,
             bytesize=format,
             timeout=args.timeout,
             xonxoff=args.xonxoff,
