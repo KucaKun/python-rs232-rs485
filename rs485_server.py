@@ -41,7 +41,7 @@ if __name__ == "__main__":
             print()
         elif inp.startswith("2"):
             address = inp.split(" ")[1]
-            recv = receive(ser, address)
+            recv = receive(ser)
             if recv:
                 print(
                     "Received:",
@@ -61,4 +61,6 @@ if __name__ == "__main__":
             print("1 [address] [function] [data]")
             print("Receive:")
             print("2 [address]")
+            print("Ping example:")
+            print("1 1 0 ping")
         time.sleep(0.2)
