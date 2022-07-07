@@ -9,23 +9,7 @@ if __name__ == "__main__":
             baudrate=args.baudrate,
             parity=args.parity,
             stopbits=args.stopbits,
-            bytesize=format,
-            timeout=args.timeout,
-            xonxoff=args.xonxoff,
-            rtscts=args.rtscts,
-            dsrdtr=args.dsrdtr,
-        )
-    else:
-        ser = serial.serial_for_url(
-            "loop://",
-            baudrate=args.baudrate,
-            parity=args.parity,
-            stopbits=args.stopbits,
-            bytesize=format,
-            timeout=args.timeout,
-            xonxoff=args.xonxoff,
-            rtscts=args.rtscts,
-            dsrdtr=args.dsrdtr,
+            bytesize=args.format,
         )
     while True:
         recv = receive(ser)
