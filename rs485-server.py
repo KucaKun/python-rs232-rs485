@@ -2,6 +2,8 @@ import argparse
 import time
 import serial
 import sys
+
+
 def get_serials():
     serials = []
     for port in serial.tools.list_ports.comports():
@@ -51,6 +53,7 @@ else:
     print("ERROR: Bad format")
     exit(1)
 
+
 def lrc(data):
     # Sum of bytes without carryover
     summed = 0
@@ -60,23 +63,27 @@ def lrc(data):
             summed -= 255
 
     # Two's compliment
-    if (summed & (1 << 7)) != 0: # if sign bit is set
+    if (summed & (1 << 7)) != 0:  # if sign bit is set
         summed -= 255
-    return (summed & 0xff).to_bytes(1, sys.byteorder)
+    return (summed & 0xFF).to_bytes(1, sys.byteorder)
+
 
 def byte_ascii(byte):
     v = hex(int(byte)).split("x")[1].upper()
-    return "0"+v if len(v) == 1 else v
+    return "0" + v if len(v) == 1 else v
 
 
 def pack_frame(address, function, data):
     data = data.encode("ascii")
     # Calculate lrc before converting bytes to ascii
-    l = lrc(address.to_bytes(1,sys.byteorder)+function.to_bytes(1,sys.byteorder)+data)
+    l = lrc(
+        address.to_bytes(1, sys.byteorder) + function.to_bytes(1, sys.byteorder) + data
+    )
     address = byte_ascii(address)
     function = byte_ascii(function)
     l = byte_ascii(l)
     return f":{address}{function}{data}{l}\r\n".encode("ascii")
+
 
 def unpack_frame(frame):
     ascii_address = frame[1:3]
@@ -84,11 +91,14 @@ def unpack_frame(frame):
     data = frame[5:-5]
     ascii_lrc = frame[-5:-3]
 
+
 def send(address, instruction, data):
     ser.write(pack_frame(address, instruction, data))
 
+
 def receive():
     return unpack_frame(ser.readline().decode("ascii"))
+
 
 if __name__ == "__main__":
 
@@ -124,7 +134,7 @@ if __name__ == "__main__":
             address = inp.split(" ")[1]
             function = inp.split(" ")[2]
             data = " ".join(inp.split(" ")[3:-1])
-            send(address,function,data)
+            send(address, function, data)
         elif inp.startswith("2"):
             address = inp.split(" ")[1]
             receive(address)
