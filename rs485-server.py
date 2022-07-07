@@ -54,10 +54,10 @@ else:
     exit(1)
 
 
-def lrc(data):
+def lrc(byte_data):
     # Sum of bytes without carryover
     summed = 0
-    for x in data:
+    for x in byte_data:
         summed += int(x)
         if summed > 255:
             summed -= 255
@@ -71,6 +71,10 @@ def lrc(data):
 def byte_ascii(byte):
     v = hex(int(byte)).split("x")[1].upper()
     return "0" + v if len(v) == 1 else v
+
+
+def ascii_byte(ascii):
+    return int("0x" + ascii, base=16)
 
 
 def pack_frame(address, function, data):
@@ -90,6 +94,17 @@ def unpack_frame(frame):
     ascii_function = frame[3:5]
     data = frame[5:-5]
     ascii_lrc = frame[-5:-3]
+
+    client = byte_ascii(ascii_address)
+    function = byte_ascii(ascii_function)
+    lrc = byte_ascii(ascii_lrc)
+    l = lrc(
+        client.to_bytes(1, sys.byteorder) + function.to_bytes(1, sys.byteorder) + data
+    )
+    if l == lrc:
+        return {"client": client, "function": function, "data": data}
+    else:
+        return {}
 
 
 def send(address, instruction, data):
@@ -135,9 +150,21 @@ if __name__ == "__main__":
             function = inp.split(" ")[2]
             data = " ".join(inp.split(" ")[3:-1])
             send(address, function, data)
+            print()
         elif inp.startswith("2"):
             address = inp.split(" ")[1]
-            receive(address)
+            recv = receive(address)
+            if recv:
+                print(
+                    "Received:",
+                    recv["data"],
+                    "\nfrom address:",
+                    recv["client"],
+                    "\nfunction:",
+                    recv["function"],
+                )
+            else:
+                print("ERROR: Wrong LRC")
         elif inp == "exit":
             exit(0)
         else:
