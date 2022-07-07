@@ -39,17 +39,20 @@ if __name__ == "__main__":
         elif inp.startswith("2"):
             address = inp.split(" ")[1]
             recv = receive(ser)
-            if recv:
-                print(
-                    "Received:",
-                    recv["data"],
-                    "\nfrom address:",
-                    recv["client"],
-                    "\nfunction:",
-                    recv["function"],
-                )
+            if recv is not None:
+                if recv["client"] != None:
+                    print(
+                        "Received:",
+                        recv["data"],
+                        "\nfrom address:",
+                        recv["client"],
+                        "\nfunction:",
+                        recv["function"],
+                    )
+                else:
+                    print("ERROR: Wrong LRC")
             else:
-                print("ERROR: Wrong LRC")
+                print("ERROR: Timeout on receive")
         elif inp == "exit":
             exit(0)
         else:

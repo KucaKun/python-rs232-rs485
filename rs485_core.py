@@ -64,7 +64,7 @@ def unpack_frame(frame):
     if l == lrc:
         return {"client": client, "function": function, "data": data.decode("ascii")}
     else:
-        return {}
+        return {"client": None, "function": None, "data": None}
 
 
 def send(ser, address, instruction, data):
@@ -72,7 +72,11 @@ def send(ser, address, instruction, data):
 
 
 def receive(ser):
-    return unpack_frame(ser.readline().decode("ascii"))
+    v = ser.readline().decode("ascii")
+    if v:
+        return unpack_frame(v)
+    else:
+        return None
 
 
 def cli():
