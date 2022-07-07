@@ -1,13 +1,6 @@
 import time
 import serial
-from rs485_core import send, receive
-
-
-def get_serials():
-    serials = []
-    for port in serial.tools.list_ports.comports():
-        serials.append(port.device)
-    return serials
+from rs485_core import send, receive, cli
 
 
 if __name__ == "__main__":
