@@ -21,39 +21,43 @@ def lrc(byte_data):
     # Two's compliment
     if (summed & (1 << 7)) != 0:  # if sign bit is set
         summed -= 255
-    return (summed & 0xFF).to_bytes(1, sys.byteorder)
+    return summed & 0xFF
 
 
-def byte_ascii(byte):
-    v = hex(int(byte)).split("x")[1].upper()
+def int_ascii(integer):
+    v = hex(integer).split("x")[1].upper()
     return "0" + v if len(v) == 1 else v
 
 
-def ascii_byte(ascii):
+def ascii_int(ascii):
     return int("0x" + ascii, base=16)
 
 
 def pack_frame(address, function, data):
-    data = data.encode("ascii")
     # Calculate lrc before converting bytes to ascii
     l = lrc(
-        address.to_bytes(1, sys.byteorder) + function.to_bytes(1, sys.byteorder) + data
+        address.to_bytes(1, sys.byteorder)
+        + function.to_bytes(1, sys.byteorder)
+        + data.encode("ascii")
     )
-    address = byte_ascii(address)
-    function = byte_ascii(function)
-    l = byte_ascii(l)
-    return f":{address}{function}{data}{l}\r\n".encode("ascii")
+    address = int_ascii(address)
+    function = int_ascii(function)
+    l = int_ascii(l)
+    frame = f":{address}{function}{data}{l}\r\n".encode("ascii")
+    print(f"Sending hex: [{frame}]")
+    return frame
 
 
 def unpack_frame(frame):
+    print(f"Received hex: [{frame}]")
     ascii_address = frame[1:3]
     ascii_function = frame[3:5]
     data = frame[5:-5]
     ascii_lrc = frame[-5:-3]
 
-    client = byte_ascii(ascii_address)
-    function = byte_ascii(ascii_function)
-    lrc = byte_ascii(ascii_lrc)
+    client = int_ascii(ascii_address)
+    function = int_ascii(ascii_function)
+    lrc = int_ascii(ascii_lrc)
     l = lrc(
         client.to_bytes(1, sys.byteorder) + function.to_bytes(1, sys.byteorder) + data
     )

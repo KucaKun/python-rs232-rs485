@@ -11,11 +11,8 @@ if __name__ == "__main__":
             baudrate=args.baudrate,
             parity=args.parity,
             stopbits=args.stopbits,
-            bytesize=format,
+            bytesize=args.format,
             timeout=args.timeout,
-            xonxoff=args.xonxoff,
-            rtscts=args.rtscts,
-            dsrdtr=args.dsrdtr,
         )
     else:
         ser = serial.serial_for_url(
@@ -23,22 +20,22 @@ if __name__ == "__main__":
             baudrate=args.baudrate,
             parity=args.parity,
             stopbits=args.stopbits,
-            bytesize=format,
+            bytesize=args.format,
             timeout=args.timeout,
-            xonxoff=args.xonxoff,
-            rtscts=args.rtscts,
-            dsrdtr=args.dsrdtr,
         )
 
     while True:
 
         inp = input("Command: ")
         if inp.startswith("1"):
-            address = inp.split(" ")[1]
-            function = inp.split(" ")[2]
-            data = " ".join(inp.split(" ")[3:-1])
-            send(ser, address, function, data)
-            print()
+            try:
+                address = inp.split(" ")[1]
+                function = inp.split(" ")[2]
+                data = " ".join(inp.split(" ")[3 : len(inp.split(" "))])
+                send(ser, int(address), int(function), data)
+            except Exception as ex:
+                print("ERROR: Wrong message format")
+                print(str(ex))
         elif inp.startswith("2"):
             address = inp.split(" ")[1]
             recv = receive(ser)
