@@ -58,7 +58,7 @@ def unpack_frame(frame):
         client.to_bytes(1, sys.byteorder) + function.to_bytes(1, sys.byteorder) + data
     )
     if l == lrc:
-        return {"client": client, "function": function, "data": data}
+        return {"client": client, "function": function, "data": data.decode("ascii")}
     else:
         return {}
 
